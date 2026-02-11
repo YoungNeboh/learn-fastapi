@@ -1,5 +1,6 @@
 from fastapi import FastAPI, Response, HTTPException
 from models import Product
+from database import SessionLocal
 
 app = FastAPI()
 
@@ -50,6 +51,7 @@ def albums_by_genre(album_genre: str):
 
 @app.get("/products")
 def all_products() -> list:
+    db = SessionLocal()
     return products
 
 @app.get("/products/{product_id}")
@@ -84,6 +86,4 @@ async def remove_product(id: int):
     
     products.remove(product)
     return {"message": "Item Removed Successfully"}
-
-
 
