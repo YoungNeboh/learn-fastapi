@@ -1,8 +1,11 @@
 from fastapi import FastAPI, Response, HTTPException
-from models import Product
-from database import SessionLocal
+from pydantic_models import Product
+from database import SessionLocal, engine
+import database_models
 
 app = FastAPI()
+
+database_models.Base.metadata.create_all(bind=engine)
 
 
 ALBUMS = [
