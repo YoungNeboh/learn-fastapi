@@ -6,10 +6,6 @@ from .shopping import CartItems
 from .constants import UserRole
 from .organization import Organization
 
-class UserOrgLink(SQLModel, table=True):
-    user_id: UUID = Field(foreign_key="user.id", primary_key=True)
-    org_id: UUID = Field(foreign_key="organization.id", primary_key=True)
-
 class Memberships(MultiTenantBase, table=True):
     __tablename__ = "memberships"
 
