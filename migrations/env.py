@@ -6,7 +6,7 @@ from sqlalchemy import pool
 from alembic import context
 
 from sqlmodel import SQLModel
-from sql_models import MultiTenantBase, UserOrgLink, User, Organization, Memberships, Products, CartItems
+from models import *
 
 
 

@@ -1,10 +1,10 @@
 from .base import MultiTenantBase
-from .constants import UserRole
+from .constants import UserRole, Memberships
 from .organization import Organization
-from .user import User, Memberships
+from .user import User
 from .shopping import Products, CartItems
 
-# This list is optional but helps with "from app.models import *"
+# This list is optional but helps with "from models import *"
 __all__ = [
     "MultiTenantBase",
     "Organization",

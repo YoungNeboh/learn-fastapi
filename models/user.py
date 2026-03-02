@@ -1,19 +1,13 @@
 from typing import Optional
 from uuid import UUID, uuid4
 from sqlmodel import SQLModel, Field, Relationship
-from .base import MultiTenantBase
-from .shopping import CartItems
-from .constants import UserRole
-from .organization import Organization
+from .constants import Memberships # not in the type_checking block because it's required at runtime for the link_model
 
-class Memberships(MultiTenantBase, table=True):
-    __tablename__ = "memberships"
+from typing import TYPE_CHECKING
 
-    user_id: UUID = Field(foreign_key="user.id", primary_key=True, index=True)
-    org_id: UUID = Field(foreign_key="organization.id", primary_key=True, index=True)
-    role: UserRole = Field(default=UserRole.CUSTOMER)
-    
-    user: "User" = Relationship(back_populates="memberships")
+if TYPE_CHECKING:
+    from .shopping import CartItems
+    from .organization import Organization
 
 class User(SQLModel, table=True):
     __tablename__ = "user"
