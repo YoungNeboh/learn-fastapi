@@ -14,6 +14,9 @@ class User(SQLModel, table=True):
 
     id: Optional[UUID] = Field(default_factory=uuid4, primary_key=True)
     name: str
+    email: str = Field(index=True)
+    hashed_password: str
+    is_active: bool = Field(default=True)
 
     memberships: list["Memberships"] = Relationship(back_populates="user")
     cart_items: list["CartItems"] = Relationship(back_populates="user")

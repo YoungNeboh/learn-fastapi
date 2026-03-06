@@ -8,8 +8,11 @@ if TYPE_CHECKING:
 
 class Organization(SQLModel, table=True):
     __tablename__ = "organization"
+    __table_args__ = {"schema": "public"}
 
     id: Optional[UUID] = Field(default_factory=uuid4, primary_key=True)
     name: str
-    # I don't need "back_populates' here because I only need to view all the users associated 
+    subdomain: str = Field(index=True, unique=True)
+    schema_name: str = Field(unique=True)
+
     users: list["User"] = Relationship(back_populates="organizations", link_model=Memberships)
