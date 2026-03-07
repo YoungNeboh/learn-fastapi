@@ -1,6 +1,7 @@
-from .base import MultiTenantBase
-from .constants import UserRole, Memberships
 from .organization import Organization
+
+from .base import MultiTenantBase
+from .constants import UserRole
 from .user import User
 from .shopping import Products, CartItems
 
@@ -9,7 +10,6 @@ __all__ = [
     "MultiTenantBase",
     "Organization",
     "User",
-    "Memberships",
     "UserRole",
     "Products",
     "CartItems",
