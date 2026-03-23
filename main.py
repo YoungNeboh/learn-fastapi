@@ -10,3 +10,5 @@ app = FastAPI()
 @app.get("/favicon.ico", include_in_schema=False)
 async def favicon():
     return Response(status_code=204) # 204 means "No Content"
+
+

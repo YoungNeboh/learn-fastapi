@@ -3,8 +3,8 @@ from uuid import UUID, uuid4
 from sqlmodel import SQLModel, Field, Relationship
 # from .constants import Memberships # not in the type_checking block because it's required at runtime for the link_model
 
-if TYPE_CHECKING:
-    from .user import User
+# if TYPE_CHECKING:
+#     from .user import User
 
 class Organization(SQLModel, table=True):
     __tablename__ = "organization"
