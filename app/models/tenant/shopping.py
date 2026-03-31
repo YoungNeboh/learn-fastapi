@@ -1,6 +1,6 @@
 from uuid import UUID
 from sqlmodel import Field, Relationship
-from .base import MultiTenantBase
+from app.models.tenant.base import MultiTenantBase
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:

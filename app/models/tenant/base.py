@@ -11,4 +11,4 @@ class MultiTenantBase(SQLModel):
     metadata = organization_metadata
     id: Optional[UUID] = Field(default_factory=uuid4, primary_key=True)
     # 'foreign_key=organization.id' ensures every record belongs to an organization
-    # org_id: UUID = Field(foreign_key="organization.id", index=True)
+    org_id: UUID = Field(foreign_key="organization.id", index=True)

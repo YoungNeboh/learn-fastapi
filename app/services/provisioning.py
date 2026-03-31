@@ -1,11 +1,11 @@
-from database import SessionLocal, engine
+from app.db.database import SessionLocal, engine
 from sqlalchemy import text
 
 # the shared "isolated" metadata instance all tenant tables inherit from
-from models.base import organization_metadata
+from app.models.tenant.base import organization_metadata
 
 # import all tables that will be created so they are registered in the tenant_metadata
-import models
+import app.models
 
 
 def provision_organization(name: str, subdomain: str, schema_name: str):
@@ -15,7 +15,7 @@ def provision_organization(name: str, subdomain: str, schema_name: str):
         session.commit()
 
         # new row detailing the new Organization in the public schema and its associated schema
-        new_org = models.Organization(name=name, subdomain=subdomain, schema_name=schema_name)
+        new_org = app.models.Organization(name=name, subdomain=subdomain, schema_name=schema_name)
         session.add(new_org)
 
         tables_to_create = []

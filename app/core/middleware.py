@@ -1,7 +1,7 @@
 from fastapi import Request, HTTPException
 from sqlalchemy import text
-from .database import SessionLocal
-from .models import Organization
+from app.db.database import SessionLocal
+from app.models import Organization
 
 
 async def organization_schema_middleware(request: Request, call_next):

@@ -1,8 +1,8 @@
 from sqlmodel import Field, Relationship
 import sqlalchemy as sa
-from .base import MultiTenantBase
+from app.models.tenant.base import MultiTenantBase
 # from .constants import Memberships # not in the type_checking block because it's required at runtime for the link_model
-from .constants import UserRole
+from app.models.tenant.constants import UserRole
 
 from typing import TYPE_CHECKING
 

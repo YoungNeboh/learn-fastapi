@@ -1,12 +1,12 @@
 from logging.config import fileConfig
 
-from sqlalchemy import engine_from_config
+from sqlalchemy import engine_from_config, text
 from sqlalchemy import pool
 
 from alembic import context
 
-from sqlmodel import SQLModel
-from models import *
+# from sqlmodel import SQLModel
+from app.db.base import SQLModel, MultiTenantBase
 
 
 
@@ -55,26 +55,62 @@ def run_migrations_offline() -> None:
         context.run_migrations()
 
 
-def run_migrations_online() -> None:
-    """Run migrations in 'online' mode.
+def run_migrations_online():
+    # Check if we are targeting a tenant or the public schema
+    # Usage: alembic -x tenant=true upgrade head
+    args = context.get_x_argument(as_dictionary=True)
+    is_tenant = args.get("tenant") == "true"
+    # Get the specific schema name passed from our loop script
+    schema_name = args.get("schema", "public") 
 
-    In this scenario we need to create an Engine
-    and associate a connection with the context.
+    # Select the correct metadata and target schema based on the context
+    if is_tenant:
+        target_metadata = MultiTenantBase.metadata
+    else:
+        target_metadata = SQLModel.metadata
 
-    """
     connectable = engine_from_config(
-        config.get_section(config.config_ini_section, {}),
+        config.get_section(config.config_ini_section),
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
     )
 
     with connectable.connect() as connection:
+        # 4. Tell Alembic to look ONLY at this schema
         context.configure(
-            connection=connection, target_metadata=target_metadata
+            connection=connection,
+            target_metadata=target_metadata,
+            # IMPORTANT: This tells Alembic which schema to "look" at
+            version_table_schema=schema_name, # Keeps migration history isolated on a per-schema basis
+            include_schemas=True,            
         )
+
+        # This forces all 'CREATE TABLE' statements to include the schema prefix
+        connection.execute(text(f"SET search_path TO {schema_name}"))
 
         with context.begin_transaction():
             context.run_migrations()
+
+# def run_migrations_online() -> None:
+#     """Run migrations in 'online' mode.
+
+#     In this scenario we need to create an Engine
+#     and associate a connection with the context.
+
+#     """
+#     connectable = engine_from_config(
+#         config.get_section(config.config_ini_section, {}),
+#         prefix="sqlalchemy.",
+#         poolclass=pool.NullPool,
+#     )
+
+#     with connectable.connect() as connection:
+#         context.configure(
+#             connection=connection, target_metadata=target_metadata
+#         )
+
+#         with context.begin_transaction():
+#             context.run_migrations()
 
 
 if context.is_offline_mode():
