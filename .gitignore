@@ -2,3 +2,4 @@ __pycache__
 .ipynb_checkpoints
 practice.py
 test_provisioning.py
+app/.env

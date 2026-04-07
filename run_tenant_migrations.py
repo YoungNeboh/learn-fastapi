@@ -1,7 +1,7 @@
 import sys
 import subprocess
 from sqlalchemy import text
-from app.db.database import engine
+from app.db.session import engine
 
 def get_schemas(target_schemas=None):
     """

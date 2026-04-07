@@ -1,4 +1,4 @@
-from app.db.database import SessionLocal, engine
+from app.db.session import SessionLocal, engine
 from sqlalchemy import text
 
 # the shared "isolated" metadata instance all tenant tables inherit from

@@ -2,7 +2,7 @@ from fastapi import FastAPI, Response, Depends
 from sqlalchemy.orm import Session
 from starlette.middleware.base import BaseHTTPMiddleware
 
-from app.db.database import engine, get_db
+from app.db.session import engine, get_db
 from app.core.middleware import organization_schema_middleware
 
 app = FastAPI()

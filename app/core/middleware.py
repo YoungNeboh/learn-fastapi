@@ -1,6 +1,6 @@
 from fastapi import Request, HTTPException
 from sqlalchemy import text
-from app.db.database import SessionLocal
+from app.db.session import SessionLocal
 from app.models import Organization
 
 
