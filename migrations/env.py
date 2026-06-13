@@ -1,4 +1,5 @@
 from logging.config import fileConfig
+import os
 
 from sqlalchemy import engine_from_config, text
 from sqlalchemy import pool
@@ -30,6 +31,21 @@ target_metadata = SQLModel.metadata
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
 
+def include_object(object, name, type_, reflected, compare_to):
+    args = context.get_x_argument(as_dictionary=True)
+    is_tenant = (
+        args.get("tenant") == "true" or 
+        config.attributes.get("is_tenant") is True or
+        os.getenv("MIGRATION_MODE") == "tenant"
+    )
+    # This tells Alembic to ignore the internal version table
+    if type_ == "table" and name == "alembic_version":
+        return False
+    ''' Ignore the organization table if we are in "tenant mode" because that 
+    table only exists in the public schema and is not relevant to tenant schemas'''
+    if is_tenant and type_ == "table" and name == "organization":
+        return False
+    return True
 
 def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode.
@@ -49,6 +65,7 @@ def run_migrations_offline() -> None:
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
+        include_object=include_object,  # Tell Alembic to use our custom function
     )
 
     with context.begin_transaction():
@@ -59,9 +76,12 @@ def run_migrations_online():
     # Check if we are targeting a tenant or the public schema
     # Usage: alembic -x tenant=true upgrade head
     args = context.get_x_argument(as_dictionary=True)
-    is_tenant = args.get("tenant") == "true"
-    # Get the specific schema name passed from our loop script
-    schema_name = args.get("schema", "public") 
+   # 1. Look for 'tenant' and 'schema' in CLI args OR in config.attributes (for automation)
+    is_tenant = (args.get("tenant") == "true" or 
+                 config.attributes.get("is_tenant") or 
+                 os.getenv("MIGRATION_MODE") == "tenant")
+    # Get the specific schema name passed from our loop script OR in config.attributes (for automation)
+    schema_name = args.get("schema") or config.attributes.get("target_schema", "public")
 
     # Select the correct metadata and target schema based on the context
     if is_tenant:
@@ -75,20 +95,22 @@ def run_migrations_online():
         poolclass=pool.NullPool,
     )
 
-    with connectable.connect() as connection:
-        # 4. Tell Alembic to look ONLY at this schema
+    with connectable.connect() as connection:        
+        # Tell Alembic to look ONLY at this schema
         context.configure(
             connection=connection,
             target_metadata=target_metadata,
             # IMPORTANT: This tells Alembic which schema to "look" at
             version_table_schema=schema_name, # Keeps migration history isolated on a per-schema basis
-            include_schemas=True,            
-        )
-
-        # This forces all 'CREATE TABLE' statements to include the schema prefix
-        connection.execute(text(f"SET search_path TO {schema_name}"))
+            include_schemas=False, # Tells Alembic to ignore other schemas when autogenerating
+            attributes={'is_tenant': is_tenant},
+            include_object=include_object,  
+        )        
+        
 
         with context.begin_transaction():
+            # IMPORTANT: Set the search path so CREATE TABLE doesn't need explicit schema prefixes
+            connection.execute(text(f"SET search_path TO {schema_name}, public"))
             context.run_migrations()
 
 # def run_migrations_online() -> None:

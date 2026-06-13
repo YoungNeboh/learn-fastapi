@@ -9,12 +9,15 @@ def get_schemas(target_schemas=None):
     Otherwise, fetch all from the DB.
     """
     if target_schemas:
-        return target_schemas
+        # Only return schemas that are BOTH in your list AND in the database
+        query = text("SELECT schema_name FROM public.organizations WHERE schema_name = ANY(:names)")
+        result = conn.execute(query, {"names": target_schemas})
         
     with engine.connect() as conn:
         # pick out only the schema names from the organizations table
         result = conn.execute(text("SELECT schema_name FROM public.organizations"))
-        return [row[0] for row in result]
+        
+    return [row[0] for row in result]
 
 def run_upgrade(schema_name):
     print(f"--- Upgrading: {schema_name} ---")
